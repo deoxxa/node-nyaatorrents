@@ -18,14 +18,14 @@ Usage
     
     var nyaatorrents = new require("nyaatorrents").client("www.nyaa.eu", 80, "/");
     
-    nyaatorrents.search({terms: "rozen maiden"}, function(err, ids) {
+    nyaatorrents.search({terms: "rozen maiden"}, function(err, entries) {
       if (err) {
         console.warn("[-] Error performing search: " + err.message);
         return;
       }
     
-      ids.forEach(function(id) {
-        tokyotosho.details(id, function(err, entry) {
+      entries.forEach(function(entry) {
+        nyaatorrents.details(entry.id, function(err, entry) {
           if (err) {
             console.warn("[-] Error fetching details for entry: " + err.message);
             return;
