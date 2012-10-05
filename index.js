@@ -76,9 +76,23 @@ NyaaTorrents.prototype.search = function search(query, cb) {
     var torrents = Array.prototype.slice.apply($("table.tlist .tlistrow")).map(function(row) {
       var obj = {};
 
-      obj.id = parseInt($(row).find(".tlistdownload a")[0].attribs.href.trim().replace(/^.+?(\d+)$/, "$1"), 10);
+      // If we can't find the download link or the category image, we just give
+      // up on this row. It shouldn't happen, but it might indicate bad markup
+      // or unhandled stuff.
+
+      var download_link = $(row).find(".tlistdownload a")[0];
+      if (!download_link) {
+        return null;
+      }
+
+      var category_image = $(row).find(".tlisticon a")[0];
+      if (!category_image) {
+        return null;
+      }
+
+      obj.id = parseInt(download_link.attribs.href.trim().replace(/^.+?(\d+)$/, "$1"), 10);
       obj.name = $(row).find(".tlistname").text().trim();
-      obj.categories = ent.decode($(row).find(".tlisticon a")[0].attribs.title).trim().split(/ >> /g).map(function(e) { return e.toLowerCase().trim().replace(/\s+/g, "-"); });
+      obj.categories = ent.decode(category_image.attribs.title).trim().split(/ >> /g).map(function(e) { return e.toLowerCase().trim().replace(/\s+/g, "-"); });
       obj.flags = row.attribs.class.split(/ /g).filter(function(e) { return e !== "tlistrow"; });
       obj.size = unfriendly_filesize($(row).find(".tlistsize").text().trim());
       obj.seeds = parseInt($(row).find(".tlistsn").text().trim(), 10);
@@ -87,6 +101,8 @@ NyaaTorrents.prototype.search = function search(query, cb) {
       obj.comments = parseInt($(row).find(".tlistmn").text().trim(), 10);
 
       return obj;
+    }).filter(function(e) {
+      return e !== null;
     });
 
     return cb(null, torrents);
