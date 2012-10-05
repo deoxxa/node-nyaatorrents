@@ -1,4 +1,4 @@
-Copyright (c) 2011, Deoxxa Development
+Copyright (c) 2012, Deoxxa Development
 ======================================
 All rights reserved.
 --------------------

@@ -1,44 +1,59 @@
-NyaaTorrents for Node.JS
-========================
+node-nyaatorrents
+=================
 
-About
------
+Search and fetch torrent information from [NyaaTorrents](http://www.nyaa.eu/).
+
+Overview
+--------
 
 This is a light abstraction of the search and view functions of NyaaTorrents
 (nyaa.eu, formerly nyaatorrents.info and nyaatorrents.org). It can currently
 search the main site and the sukebei variant.
 
-Features such as uploading or managing torrents are planned and will be added
-after the read interface is stable.
+Installation
+------------
+
+Available via [npm](http://npmjs.org/):
+
+> $ npm install nyaatorrents
+
+Or via git:
+
+> $ git clone git://github.com/deoxxa/node-nyaatorrents.git node_modules/nyaatorrents
 
 Usage
 -----
 
-    #!/usr/bin/env node
-    
-    var nyaatorrents = new require("nyaatorrents").client("www.nyaa.eu", 80, "/");
-    
-    nyaatorrents.search({terms: "rozen maiden"}, function(err, entries) {
+```javascript
+var NT = require("nyaatorrents"),
+    nt = new NT("http://www.nyaa.eu");
+
+nt.search({term: "rozen maiden"}, function(err, entries) {
+  if (err) {
+    return console.warn(err);
+  }
+
+  entries.forEach(function(entry) {
+    nt.get(entry.id, function(err, entry) {
       if (err) {
-        console.warn("[-] Error performing search: " + err.message);
-        return;
+        return console.warn(err);
       }
-    
-      entries.forEach(function(entry) {
-        nyaatorrents.details(entry.id, function(err, entry) {
-          if (err) {
-            console.warn("[-] Error fetching details for entry: " + err.message);
-            return;
-          }
-    
-          console.log(JSON.stringify(entry));
-        });
-      });
+
+      console.log(JSON.stringify(entry));
     });
+  });
+});
+```
 
-U mad?
-------
+License
+-------
 
-I can be contacted via email, github or a couple of different IRC networks. I
-frequent some channels on rizon and freenode primarily, and if I'm not playing
-silly games with my nick, you'll be able to find me there as "deoxxa".
+3-clause BSD. A copy is included with the source.
+
+Contact
+-------
+
+* GitHub ([deoxxa](http://github.com/deoxxa))
+* Twitter ([@deoxxa](http://twitter.com/deoxxa))
+* ADN ([@deoxxa](https://alpha.app.net/deoxxa))
+* Email ([deoxxa@fknsrs.biz](mailto:deoxxa@fknsrs.biz))
