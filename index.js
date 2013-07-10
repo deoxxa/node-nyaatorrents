@@ -144,7 +144,7 @@ NyaaTorrents.prototype.get = function get(id, cb) {
 
     // Categories. Super simple stuff. These are lower-cased, hyphen-delimited,
     // human-readable strings.
-    obj.categories = Array.prototype.slice.apply($(content).find("td.tinfocategory a")).map(function(e) {
+    obj.categories = Array.prototype.slice.apply($(content).find("td.viewinfocategory a")).map(function(e) {
       return $(e).text().toLowerCase().trim().replace(/\s+/g, "-");
     });
 
@@ -153,7 +153,7 @@ NyaaTorrents.prototype.get = function get(id, cb) {
     // and the latter displaying the field value. Based on the name, we do some
     // field-specific transformations on some fields. Others just get passed on
     // through as text.
-    var tds = $(content).find("table.tinfotable tr > td");
+    var tds = $(content).find("table.viewtable tr > td");
 
     for (var i=0;i<tds.length;i+=2) {
       // This is the field name.
@@ -208,11 +208,11 @@ NyaaTorrents.prototype.get = function get(id, cb) {
 
     // This is the torrent ID... You already have it, but this seemed like a
     // good idea for completeness.
-    obj.id = parseInt($(content).find("div.tinfodownloadbutton a")[0].attribs.href.replace(/^.+?(\d+)$/, "$1"), 10);
+    obj.id = parseInt($(content).find("div.viewdownloadbutton a")[0].attribs.href.replace(/^.+?(\d+)$/, "$1"), 10);
 
     // This is a chunk of HTML. You'll probably want to turn it into some other
     // kind of markup.
-    obj.description = $($(content).find("div.tinfodescription")[0]).html();
+    obj.description = $($(content).find("div.viewdescription")[0]).html();
 
     return cb(null, obj);
   });
