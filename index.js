@@ -162,7 +162,9 @@ NyaaTorrents.prototype.get = function get(id, cb) {
       switch (k) {
         // "information" is basically synonymous with "website"
         case "information":
-          obj.website = $(tds[i+1]).find("a")[0].attribs.href;
+          var link = $(tds[i+1]).find("a");
+          if (link.length)
+            obj.website = link[0].attribs.href;
           break;
 
         // "file_size" is exactly what it sounds like, and it has to be turned
