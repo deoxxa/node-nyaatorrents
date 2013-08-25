@@ -4,31 +4,9 @@
 
 var cheerio = require("cheerio"),
     ent = require("ent"),
+    filesize_parser = require("filesize-parser"),
     request = require("request"),
     url = require("url");
-
-// NyaaTorrents displays file sizes in a friendly way - let's take that and make
-// it less friendly. Note that this is an approximation.
-function unfriendly_filesize(str) {
-  var matches;
-  if (matches = str.match(/^(\d+(?:\.\d+)?) ([KMGTP]iB)$/)) {
-    var n = parseFloat(matches[1]);
-
-    // Aw yeah, switch is in the house!
-    switch (matches[2]) {
-      case "PiB": n *= 1024;
-      case "TiB": n *= 1024;
-      case "GiB": n *= 1024;
-      case "MiB": n *= 1024;
-      case "KiB": n *= 1024;
-    }
-
-    return Math.round(n);
-  }
-
-  // NaN is good, it accurately describes a failure processing some numeric data
-  return NaN;
-}
 
 // Main entry point. This is the client class. It takes a single optional
 // argument, being the base URL of the NyaaTorrents site you want to interact
@@ -94,7 +72,7 @@ NyaaTorrents.prototype.search = function search(query, cb) {
       obj.name = $(row).find(".tlistname").text().trim();
       obj.categories = ent.decode(category_image.attribs.title).trim().split(/ >> /g).map(function(e) { return e.toLowerCase().trim().replace(/\s+/g, "-"); });
       obj.flags = row.attribs.class.split(/ /g).filter(function(e) { return e !== "tlistrow"; });
-      obj.size = unfriendly_filesize($(row).find(".tlistsize").text().trim());
+      obj.size = filesize_parser($(row).find(".tlistsize").text().trim());
       obj.seeds = parseInt($(row).find(".tlistsn").text().trim(), 10);
       obj.leeches = parseInt($(row).find(".tlistln").text().trim(), 10);
       obj.downloads = parseInt($(row).find(".tlistdn").text().trim(), 10);
@@ -170,7 +148,7 @@ NyaaTorrents.prototype.get = function get(id, cb) {
         // "file_size" is exactly what it sounds like, and it has to be turned
         // into a real number.
         case "file_size":
-          obj.size = unfriendly_filesize($(tds[i+1]).text().trim());
+          obj.size = filesize_parser($(tds[i+1]).text().trim());
           break;
 
         // This is the user that submitted the torrent. We parse it out into the
