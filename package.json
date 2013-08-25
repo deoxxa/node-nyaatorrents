@@ -20,7 +20,7 @@
     "nyaa",
     "search"
   ],
-  "main": "./lib/nyaatorrents",
+  "main": "./index",
   "engines": {
     "node": ">=0.4.5"
   },
