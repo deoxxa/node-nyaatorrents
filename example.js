@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var NT = require("./index");
+var NT = require("./");
 
 var nt = new NT("http://www.nyaa.eu/");
 
