@@ -29,5 +29,8 @@
     "request": "~2.11.4",
     "cheerio": "~0.10.1",
     "filesize-parser": "https://github.com/deoxxa/filesize-parser/archive/patch-1.tar.gz"
+  },
+  "devDependencies": {
+    "docco": "~0.6.2"
   }
 }
