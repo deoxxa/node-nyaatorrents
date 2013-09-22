@@ -69,6 +69,7 @@ NyaaTorrents.prototype.search = function search(query, cb) {
       }
 
       obj.id = parseInt(download_link.attribs.href.trim().replace(/^.+?(\d+)$/, "$1"), 10);
+      obj.href = ent.decode(download_link.attribs.href);
       obj.name = $(row).find(".tlistname").text().trim();
       obj.categories = ent.decode(category_image.attribs.title).trim().split(/ >> /g).map(function(e) { return e.toLowerCase().trim().replace(/\s+/g, "-"); });
       obj.flags = row.attribs.class.split(/ /g).filter(function(e) { return e !== "tlistrow"; });
