@@ -195,6 +195,25 @@ NyaaTorrents.prototype.get = function get(id, cb) {
     // kind of markup.
     obj.description = $($(content).find("div.viewdescription")[0]).html();
 
+    // Yay comments!
+    obj.comments = [];
+
+    var commentElements = $(content).find(".comment");
+
+    // Each of these will have a blob of HTML as the "content". Same deal as
+    // above with the description.
+    for (var i=0;i<commentElements.length;++i) {
+      obj.comments.push({
+        id: parseInt(commentElements[i].attribs.id.replace(/[^0-9]/g, ""), 10),
+        time: $(commentElements[i]).find(".chead").html().split(/<br>/).pop(),
+        user: {
+          id: parseInt($(commentElements[i]).find(".chead > a")[0].attribs.href.replace(/^.+?([0-9])$/, "$1"), 10),
+          name: $(commentElements[i]).find(".chead > a > span").text(),
+        },
+        content: $(commentElements[i]).find(".cmain").html(),
+      });
+    }
+
     return cb(null, obj);
   });
 };
