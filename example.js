@@ -2,7 +2,7 @@
 
 var NT = require("./");
 
-var nt = new NT("http://www.nyaa.eu/");
+var nt = new NT("http://www.nyaa.se/");
 
 // The "anonymous" user has ID 0
 

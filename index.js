@@ -13,7 +13,7 @@ var cheerio = require("cheerio"),
 // with. If left out, it will default to "http://www.nyaa.eu/".
 var NyaaTorrents = module.exports = function NyaaTorrents(base_url) {
   if (typeof base_url === "undefined") {
-    base_url = "http://www.nyaa.eu/";
+    base_url = "http://www.nyaa.se/";
   }
 
   this.base_url = base_url;
