@@ -10,7 +10,7 @@ var cheerio = require("cheerio"),
 
 // Main entry point. This is the client class. It takes a single optional
 // argument, being the base URL of the NyaaTorrents site you want to interact
-// with. If left out, it will default to "http://www.nyaa.eu/".
+// with. If left out, it will default to "http://www.nyaa.se/".
 var NyaaTorrents = module.exports = function NyaaTorrents(base_url) {
   if (typeof base_url === "undefined") {
     base_url = "http://www.nyaa.se/";
@@ -19,7 +19,7 @@ var NyaaTorrents = module.exports = function NyaaTorrents(base_url) {
   this.base_url = base_url;
 };
 
-// Search method. This maps pretty transparently to [the search page](http://www.nyaa.eu/?page=search),
+// Search method. This maps pretty transparently to [the search page](http://www.nyaa.se/?page=search),
 // passing through the `query` hash verbatim as url parameters. If the `query`
 // argument is left out, you'll get a list of the latest torrents as you will
 // have provided no filter arguments. The second argument is a callback that
@@ -117,7 +117,7 @@ NyaaTorrents.prototype.get = function get(id, cb) {
 
     var obj = {};
 
-    // These are things like "trusted" or "remake". See [the NyaaTorrents manual](http://forums.nyaa.eu/index.php?/topic/1284-nyaatorrents-manual/)
+    // These are things like "trusted" or "remake". See [the NyaaTorrents manual](http://www.nyaa.se/?page=manual)
     // for more information.
     obj.flags = content.attribs.class.split(/ /g).filter(function(e) { return e !== "content"; });
 
