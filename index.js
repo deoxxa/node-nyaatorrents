@@ -11,12 +11,15 @@ var cheerio = require("cheerio"),
 // Main entry point. This is the client class. It takes a single optional
 // argument, being the base URL of the NyaaTorrents site you want to interact
 // with. If left out, it will default to "http://www.nyaa.se/".
-var NyaaTorrents = module.exports = function NyaaTorrents(base_url) {
-  if (typeof base_url === "undefined") {
-    base_url = "http://www.nyaa.se/";
-  }
+var NyaaTorrents = module.exports = function NyaaTorrents(options) {
+  options = options || {};
 
-  this.base_url = base_url;
+  this.baseUrl = options.baseUrl || "http://www.nyaa.se/";
+  this.username = options.username;
+  this.password = options.password;
+
+  this.cookies = request.jar();
+};
 };
 
 // Search method. This maps pretty transparently to [the search page](http://www.nyaa.se/?page=search),
@@ -26,22 +29,22 @@ var NyaaTorrents = module.exports = function NyaaTorrents(base_url) {
 // will be called on completion with `err` and `results` arguments. `err` will
 // be null in the case of success.
 NyaaTorrents.prototype.search = function search(query, cb) {
-  var uri = url.parse(this.base_url);
+  var uri = url.parse(this.baseUrl, true);
 
   if (typeof query === "function") {
     cb = query;
     query = null;
   }
 
-  if (typeof query !== "object" || query === null) {
-    query = {};
+  query = query || {};
+
+  for (var k in query) {
+    uri.query[k] = query[k];
   }
 
-  query.page = "torrents";
+  uri.query.page = "torrents";
 
-  uri.query = query;
-
-  request(url.format(uri), function(err, res, data) {
+  request({uri: uri, jar: this.cookies}, function(err, res, data) {
     if (err) {
       return cb(err);
     }
@@ -93,14 +96,12 @@ NyaaTorrents.prototype.search = function search(query, cb) {
 // a callback to be called on completion with `err` and `result` arguments. As
 // with the previous method, `err` will be null in the case of success.
 NyaaTorrents.prototype.get = function get(id, cb) {
-  var uri = url.parse(this.base_url);
+  var uri = url.parse(this.baseUrl, true);
 
-  uri.query = {
-    page: "torrentinfo",
-    tid: id,
-  };
+  uri.query.page = "torrentinfo";
+  uri.query.tid = id;
 
-  request(url.format(uri), function(err, res, data) {
+  request({uri: uri, jar: this.cookies}, function(err, res, data) {
     if (err) {
       return cb(err);
     }
