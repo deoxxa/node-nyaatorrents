@@ -20,6 +20,38 @@ var NyaaTorrents = module.exports = function NyaaTorrents(options) {
 
   this.cookies = request.jar();
 };
+
+NyaaTorrents.prototype.login = function login(cb) {
+  var uri = url.parse(this.baseUrl, true);
+
+  uri.query.page = "login";
+
+  var options = {
+    uri: uri,
+    form: {
+      method: 1,
+      login: this.username,
+      password: this.password,
+      submit: "Submit",
+    },
+    jar: this.cookies,
+  };
+
+  request.post(options, function(err, res, data) {
+    if (err) {
+      return cb(err);
+    }
+
+    if (res.statusCode !== 303) {
+      return cb(Error("invalid status code; expected 303 but got " + res.statusCode));
+    }
+
+    if (data.indexOf("Login failed!") !== -1) {
+      return cb(Error("login failed; incorrect password?"));
+    }
+
+    return cb();
+  });
 };
 
 // Search method. This maps pretty transparently to [the search page](http://www.nyaa.se/?page=search),
