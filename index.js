@@ -27,7 +27,7 @@ NyaaTorrents.prototype.login = function login(cb) {
   uri.query.page = "login";
 
   var options = {
-    uri: uri,
+    uri: url.format(uri),
     form: {
       method: 1,
       login: this.username,
@@ -42,8 +42,8 @@ NyaaTorrents.prototype.login = function login(cb) {
       return cb(err);
     }
 
-    if (res.statusCode !== 303) {
-      return cb(Error("invalid status code; expected 303 but got " + res.statusCode));
+    if (data.indexOf("Login successful") === -1) {
+      return cb(Error("login was not successful"));
     }
 
     if (data.indexOf("Login failed!") !== -1) {
