@@ -54,6 +54,63 @@ NyaaTorrents.prototype.login = function login(cb) {
   });
 };
 
+NyaaTorrents.prototype.upload = function upload(options, cb) {
+  if (!options.category) {
+    return cb(Error("a category is required"));
+  }
+
+  if (options.category.match(/^\d+_\d+$/)) {
+    options.catid = options.category;
+  }
+
+  var uri = url.parse(this.baseUrl, true);
+
+  uri.query.page = "upload";
+
+  var config = {
+    uri: url.format(uri),
+    jar: this.cookies,
+  };
+
+  var req = request.post(config, function(err, res, data) {
+    if (err) {
+      return cb(err);
+    }
+
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      return cb(Error("invalid status code; expected 2xx but got " + res.statusCode));
+    }
+
+    if (!res.headers["record-id"]) {
+      return cb(Error("couldn't find record-id header"));
+    }
+
+    return cb(null, {id: res.headers["record-id"]});
+  });
+
+  var form = req.form();
+
+  form.append("rules", "1");
+  form.append("submit", "Upload");
+
+  ["name", "torrenturl", "catid", "info", "description"].forEach(function(k) {
+    form.append(k, options[k] || "");
+  });
+
+  ["hidden", "remake", "anonymous"].forEach(function(k) {
+    if (options[k]) {
+      form.append(k, "1");
+    }
+  });
+
+  if (options.torrent) {
+    form.append("torrent", options.torrent, {
+      filename: "uploaded.torrent",
+      contentType: "application/x-bittorrent",
+    });
+  }
+};
+
 // Search method. This maps pretty transparently to [the search page](http://www.nyaa.se/?page=search),
 // passing through the `query` hash verbatim as url parameters. If the `query`
 // argument is left out, you'll get a list of the latest torrents as you will
