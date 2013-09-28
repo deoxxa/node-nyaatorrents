@@ -111,6 +111,84 @@ NyaaTorrents.prototype.upload = function upload(options, cb) {
   }
 };
 
+NyaaTorrents.prototype.manage = function manage(options, cb) {
+  var uri = url.parse(this.baseUrl, true);
+
+  uri.query.page = "manage";
+  uri.query.op = 1;
+
+  var form = {
+    tid: options.id,
+    mod: options.mod,
+    submit: "Submit",
+  };
+
+  form[["tid", options.id].join("-")] = options.id;
+
+  if (options.category) {
+    form.move = options.category;
+  }
+
+  var config = {
+    uri: url.format(uri),
+    form: form,
+    jar: this.cookies,
+  };
+
+  request.post(config, function(err, res, data) {
+    if (err) {
+      return cb(err);
+    }
+
+    if (res.statusCode !== 200) {
+      return cb(Error("invalid status code; expected 200 but got " + res.statusCode));
+    }
+
+    var $ = cheerio.load(data);
+
+    var content = $($(".content")[0]).text();
+
+    if (content.indexOf("You will be redirected") === -1) {
+      return cb(Error(content.trim()));
+    }
+
+    var message = content.replace(/You will be redirected.+$/, "").trim();
+
+    if (message === "Access restricted.") {
+      return cb(Error(message));
+    }
+
+    return cb(null, {message: message}, data);
+  });
+};
+
+NyaaTorrents.prototype.remove = function remove(id, cb) {
+  return this.manage({mod: 1, id: id}, cb);
+};
+
+NyaaTorrents.prototype.hide = function hide(id, cb) {
+  return this.manage({mod: 2, id: id}, cb);
+};
+
+NyaaTorrents.prototype.unhide = function unhide(id, cb) {
+  return this.manage({mod: 3, id: id}, cb);
+};
+
+NyaaTorrents.prototype.markRemake = function markRemake(id, cb) {
+  return this.manage({mod: 4, id: id}, cb);
+};
+
+NyaaTorrents.prototype.unmarkRemake = function unmarkRemake(id, cb) {
+  return this.manage({mod: 5, id: id}, cb);
+};
+
+// 6 through 13 all return "access restricted" - I'm guessing they're for things
+// like trusted status and other admin/moderator-only actions.
+
+NyaaTorrents.prototype.move = function move(id, category, cb) {
+  return this.manage({mod: 14, id: id, category: category}, cb);
+};
+
 // Search method. This maps pretty transparently to [the search page](http://www.nyaa.se/?page=search),
 // passing through the `query` hash verbatim as url parameters. If the `query`
 // argument is left out, you'll get a list of the latest torrents as you will
