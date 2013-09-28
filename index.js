@@ -189,6 +189,51 @@ NyaaTorrents.prototype.move = function move(id, category, cb) {
   return this.manage({mod: 14, id: id, category: category}, cb);
 };
 
+NyaaTorrents.prototype.addComment = function addComment(id, content, cb) {
+  var uri = url.parse(this.baseUrl, true);
+
+  uri.query.page = "view";
+  uri.query.tid = id;
+  uri.query.post = 1;
+
+  var config = {
+    uri: url.format(uri),
+    form: {
+      message: content,
+      submit: "Submit",
+    },
+    jar: this.cookies,
+  };
+
+  request.post(config, function(err, res, data) {
+    if (err) {
+      return cb(err);
+    }
+
+    if (res.statusCode !== 303) {
+      return cb(Error("invalid status code; expected 303 but got " + res.statusCode));
+    }
+
+    if (!res.headers.location) {
+      return cb(Error("couldn't find location header to get comment ID"));
+    }
+
+    if (!res.headers.location.match(/#/)) {
+      return cb(Error("comment not posted; maybe duplicate?"));
+    }
+
+    var commentId = res.headers.location.split("#").pop();
+
+    if (!commentId || !commentId.match(/^c\d+$/)) {
+      return cb(Error("malformed location header; couldn't find comment ID"));
+    }
+
+    return cb(null, {
+      commentId: commentId.replace(/^c/, ""),
+    });
+  });
+};
+
 // Search method. This maps pretty transparently to [the search page](http://www.nyaa.se/?page=search),
 // passing through the `query` hash verbatim as url parameters. If the `query`
 // argument is left out, you'll get a list of the latest torrents as you will
