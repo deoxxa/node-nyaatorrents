@@ -256,7 +256,7 @@ NyaaTorrents.prototype.search = function search(query, cb) {
 
   uri.query.page = "search";
 
-  request({uri: uri, jar: this.cookies}, function(err, res, data) {
+  request({uri: url.format(uri), jar: this.cookies}, function(err, res, data) {
     if (err) {
       return cb(err);
     }
