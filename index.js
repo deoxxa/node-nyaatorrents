@@ -3,7 +3,7 @@
 // implementation thereof.
 
 var cheerio = require("cheerio"),
-    ent = require("ent"),
+    he = require("he"),
     filesize_parser = require("filesize-parser"),
     request = require("request"),
     url = require("url");
@@ -284,9 +284,9 @@ NyaaTorrents.prototype.search = function search(query, cb) {
       }
 
       obj.id = parseInt(download_link.attribs.href.trim().replace(/^.+?(\d+)$/, "$1"), 10);
-      obj.href = ent.decode(download_link.attribs.href);
+      obj.href = he.decode(download_link.attribs.href);
       obj.name = $(row).find(".tlistname").text().trim();
-      obj.categories = ent.decode(category_image.attribs.title).trim().split(/ >> /g).map(function(e) { return e.toLowerCase().trim().replace(/\s+/g, "-"); });
+      obj.categories = he.decode(category_image.attribs.title).trim().split(/ >> /g).map(function(e) { return e.toLowerCase().trim().replace(/\s+/g, "-"); });
       obj.flags = row.attribs.class.split(/ /g).filter(function(e) { return e !== "tlistrow"; });
       obj.size = filesize_parser($(row).find(".tlistsize").text().trim());
       obj.seeds = parseInt($(row).find(".tlistsn").text().trim(), 10);
@@ -325,7 +325,7 @@ NyaaTorrents.prototype.get = function get(id, cb) {
     // When there's an error, it's displayed as text in the spot where the page
     // content would usually go. We pass that through as-is to the user.
     if (content.children.length === 1 && content.children[0].type === "text") {
-      return cb(Error(ent.decode(content.children[0].data).trim()));
+      return cb(Error(he.decode(content.children[0].data).trim()));
     }
 
     var obj = {};
