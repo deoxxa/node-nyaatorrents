@@ -262,6 +262,34 @@ NyaaTorrents.prototype.search = function search(query, cb) {
     }
 
     var $ = cheerio.load(data);
+    if ($("table.tlist .tlistrow").length === 0) {
+        var viewtable = $("table.viewtable");
+        if (viewtable.length === 0) {
+            return cb(null, []);
+        }
+
+        var download_link = $("div.content.trusted div.viewdownloadbutton > a");
+
+        if (download_link.length === 0) {
+            return cb(new Error("Can't find a download link"));
+        }
+
+        var info = viewtable.find("td.vtop");
+        var obj = {};
+        try {
+            obj.id = parseInt(download_link.attr('href').trim().replace(/^.+?(\d+)$/, "$1"), 10);
+            obj.href = ent.decode(download_link.attr('href'));
+            obj.name = viewtable.find(".viewtorrentname").text().trim();
+            obj.size = filesize_parser(info.eq(4).text().trim());
+            obj.seeds = parseInt(info.eq(1).text().trim(), 10);
+            obj.leeches = parseInt(info.eq(2).text().trim(), 10);
+            obj.downloads = parseInt(info.eq(3).text().trim(), 10);
+        }catch(error) {
+            return cb(error);
+        }
+
+        return cb(null, [obj]);
+    }
 
     // Our results are found in a table with a predictable structure. Some of
     // this code might be fragile - expect updates here to improve performance
