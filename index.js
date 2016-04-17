@@ -8,6 +8,13 @@ var cheerio = require("cheerio"),
     request = require("request"),
     url = require("url");
 
+if (!String.prototype.startsWith) {
+  String.prototype.startsWith = function(searchString, position) {
+    position = position || 0;
+    return this.indexOf(searchString, position) === position;
+  };
+}
+
 // Main entry point. This is the client class. It takes a single optional
 // argument, being the base URL of the NyaaTorrents site you want to interact
 // with. If left out, it will default to "http://www.nyaa.se/".
@@ -241,6 +248,8 @@ NyaaTorrents.prototype.addComment = function addComment(id, content, cb) {
 // will be called on completion with `err` and `results` arguments. `err` will
 // be null in the case of success.
 NyaaTorrents.prototype.search = function search(query, cb) {
+
+
   var uri = url.parse(this.baseUrl, true);
 
   if (typeof query === "function") {
@@ -274,11 +283,17 @@ NyaaTorrents.prototype.search = function search(query, cb) {
             return cb(new Error("Can't find a download link"));
         }
 
+        var downloadUrl = ent.decode(download_link.attr('href'));
+
+        if(downloadUrl.startsWith('//')) {
+            downloadUrl = 'https:'+ downloadUrl;
+        }
+
         var info = viewtable.find("td.vtop");
         var obj = {};
         try {
             obj.id = parseInt(download_link.attr('href').trim().replace(/^.+?(\d+)$/, "$1"), 10);
-            obj.href = ent.decode(download_link.attr('href'));
+            obj.href = downloadUrl;
             obj.name = viewtable.find(".viewtorrentname").text().trim();
             obj.size = filesize_parser(info.eq(4).text().trim());
             obj.seeds = parseInt(info.eq(1).text().trim(), 10);
@@ -306,13 +321,19 @@ NyaaTorrents.prototype.search = function search(query, cb) {
         return null;
       }
 
+      var downloadUrl = ent.decode(download_link.attr('href'));
+
+      if(downloadUrl.startsWith('//')) {
+        downloadUrl = 'https:'+ downloadUrl;
+      }
+
       var category_image = $(row).find(".tlisticon a")[0];
       if (!category_image) {
         return null;
       }
 
       obj.id = parseInt(download_link.attribs.href.trim().replace(/^.+?(\d+)$/, "$1"), 10);
-      obj.href = ent.decode(download_link.attribs.href);
+      obj.href = downloadUrl;
       obj.name = $(row).find(".tlistname").text().trim();
       obj.categories = ent.decode(category_image.attribs.title).trim().split(/ >> /g).map(function(e) { return e.toLowerCase().trim().replace(/\s+/g, "-"); });
       obj.flags = row.attribs.class.split(/ /g).filter(function(e) { return e !== "tlistrow"; });
