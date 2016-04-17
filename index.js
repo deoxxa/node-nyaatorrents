@@ -268,7 +268,7 @@ NyaaTorrents.prototype.search = function search(query, cb) {
             return cb(null, []);
         }
 
-        var download_link = $("div.content.trusted div.viewdownloadbutton > a");
+        var download_link = $("div.content div.viewdownloadbutton > a");
 
         if (download_link.length === 0) {
             return cb(new Error("Can't find a download link"));
