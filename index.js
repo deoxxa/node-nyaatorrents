@@ -286,7 +286,7 @@ NyaaTorrents.prototype.search = function search(query, cb) {
         var downloadUrl = ent.decode(download_link.attr('href'));
 
         if(downloadUrl.startsWith('//')) {
-            downloadUrl = 'https:'+ downloadUrl;
+            downloadUrl = 'http:'+ downloadUrl;
         }
 
         var info = viewtable.find("td.vtop");
@@ -321,10 +321,10 @@ NyaaTorrents.prototype.search = function search(query, cb) {
         return null;
       }
 
-      var downloadUrl = ent.decode(download_link.attr('href'));
+      var downloadUrl = ent.decode(download_link.attribs.href);
 
       if(downloadUrl.startsWith('//')) {
-        downloadUrl = 'https:'+ downloadUrl;
+        downloadUrl = 'http:'+ downloadUrl;
       }
 
       var category_image = $(row).find(".tlisticon a")[0];
